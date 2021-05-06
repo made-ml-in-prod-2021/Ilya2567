@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from ..enities import TrainingParams
+from ..entities import TrainingParams
 
 
 def pickle_load(path):
@@ -79,7 +79,6 @@ def train():
 
 @hydra.main(
     config_path=os.path.join("..", "..",),
-    # config_path=os.path.join("..", "..", "configs"),
     # config_name="training_params.yml"
             )
 def train_pipeline_command(cfg: TrainingParams = None):

@@ -1,0 +1,2 @@
+model_type: RandomForestClassifier
+random_state: 42

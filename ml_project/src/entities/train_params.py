@@ -4,9 +4,11 @@ from dataclasses import dataclass
 from omegaconf import MISSING
 
 from .models import ModelConfig
+from .splits import SplitConfig
 
 
 @dataclass()
 class TrainingParams:
     models: ModelConfig = MISSING  # field(default="RandomForestClassifier")
-    random_state: int = MISSING
+    splits: SplitConfig = MISSING
+    # random_state: int = MISSING

@@ -1,4 +1,5 @@
 defaults:
   - models: RandomForestClassifier
+  - splits: test_20_random_42
 
-random_state: 42
+#random_state: 42

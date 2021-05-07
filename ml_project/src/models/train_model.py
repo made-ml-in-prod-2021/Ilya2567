@@ -48,8 +48,9 @@ def train(cfg: TrainingParams):
     num_cols = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']
     assert set(bin_cols) | set(cat_cols) | set(num_cols) == set(heart.columns)
 
+    print(cfg.splits)
     heart_train, heart_test, target_train, target_test = train_test_split(
-        heart, target, test_size=0.2, random_state=cfg.random_state
+        heart, target, **cfg.splits
     )
     cat_pipe = Pipeline([
         ('ohe', OneHotEncoder(drop='if_binary'))
@@ -65,31 +66,28 @@ def train(cfg: TrainingParams):
     x_test = col_transformer.transform(heart_test)
 
     model = hydra.utils.instantiate(cfg.models)
-    # model = RandomForestClassifier(max_depth=5)
-    # print(model)
     model.fit(x_train, target_train)
-    # print(model.score(x_train, target_train))
+    # score = model.score(x_train, target_train)
+    # print(score)
+
 
     # path = os.path.join('models', 'model.pkl')
     pickle_dump(model, 'model.pkl')
 
     y_pred = model.predict(x_test)
     metrics_dict = {
+        'score': float(model.score(x_train, target_train)),
         'f1_metric': float(f1_score(y_pred, target_test)),
         'conf_matrix': confusion_matrix(y_pred, target_test).tolist(),
     }
+    logger.debug('score: %.4f', metrics_dict['score'])
     logger.info('f1_metric: %.4f', metrics_dict['f1_metric'])
-    conf_matrix = '\n'.join(map(str, metrics_dict['conf_matrix']))
-    logger.info('confusion_matrix: \n%s', conf_matrix)
-    # conf_matrix = dict(zip(count(), metrics_dict['conf_matrix']))
-    # print(conf_matrix)
-    # logger.info('metrics:', extra=conf_matrix)
+    conf_matrix_str = '\n'.join(map(str, metrics_dict['conf_matrix']))
+    logger.info('confusion_matrix: \n%s', conf_matrix_str)
 
     # path = os.path.join('reports', 'model.yml')
     with open('metrics.yaml', "w") as fin:
         yaml_report = yaml.dump(metrics_dict)
-        # report = OmegaConf.create(metrics_dict)
-        # yaml_report = OmegaConf.to_yaml(report)
         fin.writelines(yaml_report)
 
     logger.info("Finished train pipeline")

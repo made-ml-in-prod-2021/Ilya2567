@@ -1,17 +1,23 @@
 import os
 import pickle
+import logging
+# from itertools import count
 
 import hydra
 import pandas as pd
-from omegaconf import OmegaConf
+# from omegaconf import OmegaConf
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import f1_score
+# from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import f1_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+import yaml
 
 from ..entities import TrainingParams
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 def pickle_load(path):
@@ -24,10 +30,13 @@ def pickle_dump(obj, path):
     # assert not os.path.exists(path), f'{path} already exists!'
     with open(path, 'wb') as fout:
         pickle.dump(obj, fout)
-    print(f'Object saved.')
+    logger.debug(f'Object saved.')
 
 
 def train(cfg: TrainingParams):
+    logger.info("Started train pipeline")
+    logger.debug('cwd: %s', hydra.utils.get_original_cwd())
+
     path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'raw', 'heart.csv')
     heart = pd.read_csv(path)
     assert heart.isna().sum().sum() == 0
@@ -65,31 +74,36 @@ def train(cfg: TrainingParams):
     pickle_dump(model, 'model.pkl')
 
     y_pred = model.predict(x_test)
-    f1_metric = f1_score(y_pred, target_test)
-
-    report_dict = {
-        # 'model': cfg,
-        'f1_metric': str(f1_metric),
+    metrics_dict = {
+        'f1_metric': float(f1_score(y_pred, target_test)),
+        'conf_matrix': confusion_matrix(y_pred, target_test).tolist(),
     }
-    report = OmegaConf.create(report_dict)
-    yaml_report = OmegaConf.to_yaml(report)
+    logger.info('f1_metric: %.4f', metrics_dict['f1_metric'])
+    conf_matrix = '\n'.join(map(str, metrics_dict['conf_matrix']))
+    logger.info('confusion_matrix: \n%s', conf_matrix)
+    # conf_matrix = dict(zip(count(), metrics_dict['conf_matrix']))
+    # print(conf_matrix)
+    # logger.info('metrics:', extra=conf_matrix)
 
     # path = os.path.join('reports', 'model.yml')
     with open('metrics.yaml', "w") as fin:
+        yaml_report = yaml.dump(metrics_dict)
+        # report = OmegaConf.create(metrics_dict)
+        # yaml_report = OmegaConf.to_yaml(report)
         fin.writelines(yaml_report)
+
+    logger.info("Finished train pipeline")
 
 
 @hydra.main(
-    config_path=os.path.join("..", "..", 'configs'),
+    config_path=os.path.join('..', '..', 'configs'),
     # config_name="training_params.yaml"
 )
 def train_pipeline_command(cfg: TrainingParams = None):
-    # params = read_training_pipeline_params(config_path)
-    # train_pipeline(params)
-    print(type(cfg), cfg)
+    logger.debug("cfg: %s", cfg)
     train(cfg)
 
 
-# python -m src.models.train_model --config-name ./configs/training_params.yaml
+# python -m src.models.train_model --config-name training_params.yaml
 if __name__ == "__main__":
     train_pipeline_command()

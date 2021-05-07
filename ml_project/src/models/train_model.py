@@ -27,8 +27,8 @@ def pickle_dump(obj, path):
     print(f'Object saved.')
 
 
-def train():
-    path = os.path.join('data', 'raw', 'heart.csv')
+def train(cfg: TrainingParams):
+    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'raw', 'heart.csv')
     heart = pd.read_csv(path)
     assert heart.isna().sum().sum() == 0
 
@@ -40,7 +40,7 @@ def train():
     assert set(bin_cols) | set(cat_cols) | set(num_cols) == set(heart.columns)
 
     heart_train, heart_test, target_train, target_test = train_test_split(
-        heart, target, test_size=0.2, random_state=42
+        heart, target, test_size=0.2, random_state=cfg.random_state
     )
     cat_pipe = Pipeline([
         ('ohe', OneHotEncoder(drop='if_binary'))
@@ -55,38 +55,41 @@ def train():
     x_train = col_transformer.fit_transform(heart_train)
     x_test = col_transformer.transform(heart_test)
 
-    model = RandomForestClassifier(max_depth=5)
+    model = hydra.utils.instantiate(cfg.models)
+    # model = RandomForestClassifier(max_depth=5)
+    # print(model)
     model.fit(x_train, target_train)
-    # model.score(x_train, target_train)
+    # print(model.score(x_train, target_train))
 
-    path = os.path.join('models', 'model.pkl')
-    pickle_dump(model, path)
+    # path = os.path.join('models', 'model.pkl')
+    pickle_dump(model, 'model.pkl')
 
     y_pred = model.predict(x_test)
     f1_metric = f1_score(y_pred, target_test)
 
     report_dict = {
-        'model_type': 'RandomForestClassifier',
+        # 'model': cfg,
         'f1_metric': str(f1_metric),
     }
     report = OmegaConf.create(report_dict)
     yaml_report = OmegaConf.to_yaml(report)
 
-    path = os.path.join('reports', 'model.yml')
-    with open(path, "w") as fin:
+    # path = os.path.join('reports', 'model.yml')
+    with open('metrics.yaml', "w") as fin:
         fin.writelines(yaml_report)
 
 
 @hydra.main(
-    config_path=os.path.join("..", "..",),
-    # config_name="training_params.yml"
-            )
+    config_path=os.path.join("..", "..", 'configs'),
+    # config_name="training_params.yaml"
+)
 def train_pipeline_command(cfg: TrainingParams = None):
     # params = read_training_pipeline_params(config_path)
     # train_pipeline(params)
-    print(cfg)
+    print(type(cfg), cfg)
+    train(cfg)
 
 
-# python -m src.models.train_model --config-name ./configs/training_params.yml
+# python -m src.models.train_model --config-name ./configs/training_params.yaml
 if __name__ == "__main__":
     train_pipeline_command()

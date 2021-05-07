@@ -1,0 +1,4 @@
+defaults:
+  - models: RandomForestClassifier
+
+random_state: 42

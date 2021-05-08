@@ -18,4 +18,3 @@ class TrainingParams:
     categorical_columns: List[str] = MISSING
     numerical_columns: List[str] = MISSING
     # random_state: int = MISSING
-

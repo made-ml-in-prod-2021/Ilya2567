@@ -1,4 +1,0 @@
-# @package _group_
-defaults:
-  - encoders: cat_ohe_drop_binary
-#  - columns: ['sex', 'fbs', 'exang', 'cp', 'restecg', 'slope', 'thal']

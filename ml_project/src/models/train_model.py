@@ -1,36 +1,33 @@
 import os
-import pickle
+# import pickle
 import logging
-# from itertools import count
 
 import hydra
 import pandas as pd
-# from omegaconf import OmegaConf
 from sklearn.compose import ColumnTransformer
-# from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import yaml
 
 from ..entities import TrainingParams
+from .utils import pickle_dump
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def pickle_load(path):
-    assert os.path.exists(path), f'{path} not exists!'
-    with open(path, 'rb') as fin:
-        return pickle.load(fin)
-
-
-def pickle_dump(obj, path):
-    # assert not os.path.exists(path), f'{path} already exists!'
-    with open(path, 'wb') as fout:
-        pickle.dump(obj, fout)
-    logger.debug(f'Object saved.')
+# def pickle_load(path):
+#     assert os.path.exists(path), f'{path} not exists!'
+#     with open(path, 'rb') as fin:
+#         return pickle.load(fin)
+#
+#
+# def pickle_dump(obj, path):
+#     # assert not os.path.exists(path), f'{path} already exists!'
+#     with open(path, 'wb') as fout:
+#         pickle.dump(obj, fout)
+#     logger.debug(f'Object saved.')
 
 
 def train(cfg: TrainingParams):
@@ -50,10 +47,10 @@ def train(cfg: TrainingParams):
     cat_enc = hydra.utils.instantiate(cfg.categorical_encoders)
     num_enc = hydra.utils.instantiate(cfg.numerical_encoders)
     cat_pipe = Pipeline([
-        ('ohe', cat_enc)
+        ('cat_scaler', cat_enc)
     ])
     num_pipe = Pipeline([
-        ('scaler', num_enc)
+        ('num_scaler', num_enc)
     ])
     col_transformer = ColumnTransformer([
         ('cat_pipe', cat_pipe, list(cfg.categorical_columns)),
@@ -64,7 +61,6 @@ def train(cfg: TrainingParams):
 
     model = hydra.utils.instantiate(cfg.models)
     model.fit(x_train, target_train)
-    # path = os.path.join('models', 'model.pkl')
     pickle_dump(model, 'model.pkl')
 
     y_pred = model.predict(x_test)

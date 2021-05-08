@@ -1,7 +1,5 @@
 from dataclasses import dataclass
 
-# from omegaconf import MISSING
-
 
 @dataclass
 class SplitConfig:

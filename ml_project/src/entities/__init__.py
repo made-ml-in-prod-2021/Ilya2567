@@ -1,2 +1,2 @@
 from .train_params import TrainingParams
-from .models import RandomForestClassifierConfig, LogisticRegressionConfig
+from .models import ObjectConfig, RandomForestClassifierConfig, LogisticRegressionConfig

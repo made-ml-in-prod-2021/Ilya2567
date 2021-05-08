@@ -1,5 +1,9 @@
 defaults:
-  - models: RandomForestClassifier
   - splits: test_20_random_42
+  - categorical_encoders: ohe_drop_binary
+  - numerical_encoders: StandardScaler
+  - models: RandomForestClassifier
 
-#random_state: 42
+target_column: 'target'
+categorical_columns: ['sex', 'fbs', 'exang', 'cp', 'restecg', 'slope', 'thal']
+numerical_columns: ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']

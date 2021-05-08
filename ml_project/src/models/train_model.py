@@ -41,36 +41,29 @@ def train(cfg: TrainingParams):
     heart = pd.read_csv(path)
     assert heart.isna().sum().sum() == 0
 
-    target = heart.pop('target')
+    target = heart.pop(cfg.target_column)
 
-    bin_cols = ['sex', 'fbs', 'exang', ]
-    cat_cols = ['cp', 'restecg', 'slope', 'thal']
-    num_cols = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']
-    assert set(bin_cols) | set(cat_cols) | set(num_cols) == set(heart.columns)
-
-    print(cfg.splits)
     heart_train, heart_test, target_train, target_test = train_test_split(
         heart, target, **cfg.splits
     )
+
+    cat_enc = hydra.utils.instantiate(cfg.categorical_encoders)
+    num_enc = hydra.utils.instantiate(cfg.numerical_encoders)
     cat_pipe = Pipeline([
-        ('ohe', OneHotEncoder(drop='if_binary'))
+        ('ohe', cat_enc)
     ])
     num_pipe = Pipeline([
-        ('scaler', StandardScaler())
+        ('scaler', num_enc)
     ])
     col_transformer = ColumnTransformer([
-        ('categorical_pipeline', cat_pipe, bin_cols + cat_cols),
-        ('num_pipe', num_pipe, num_cols),
+        ('cat_pipe', cat_pipe, list(cfg.categorical_columns)),
+        ('num_pipe', num_pipe, list(cfg.numerical_columns)),
     ])
     x_train = col_transformer.fit_transform(heart_train)
     x_test = col_transformer.transform(heart_test)
 
     model = hydra.utils.instantiate(cfg.models)
     model.fit(x_train, target_train)
-    # score = model.score(x_train, target_train)
-    # print(score)
-
-
     # path = os.path.join('models', 'model.pkl')
     pickle_dump(model, 'model.pkl')
 
@@ -95,7 +88,7 @@ def train(cfg: TrainingParams):
 
 @hydra.main(
     config_path=os.path.join('..', '..', 'configs'),
-    # config_name="training_params.yaml"
+    config_name="training_params.yaml"
 )
 def train_pipeline_command(cfg: TrainingParams = None):
     logger.debug("cfg: %s", cfg)

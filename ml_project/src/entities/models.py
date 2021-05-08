@@ -4,16 +4,16 @@ from omegaconf import MISSING
 
 
 @dataclass
-class ModelConfig:
+class ObjectConfig:
     _target_: str = MISSING
 
 
 @dataclass
-class RandomForestClassifierConfig(ModelConfig):
+class RandomForestClassifierConfig(ObjectConfig):
     max_depth: int = MISSING
 
 
 @dataclass
-class LogisticRegressionConfig(ModelConfig):
+class LogisticRegressionConfig(ObjectConfig):
     C: float = MISSING
     random_state: int = MISSING

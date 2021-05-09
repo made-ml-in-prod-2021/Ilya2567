@@ -1,5 +1,5 @@
 defaults:
-  - splits: test_25_random_24.yaml
+  - splits: test_20_random_42.yaml
   - categorical_encoders: ohe_drop_binary
   - numerical_encoders: QuantileTransformer
 

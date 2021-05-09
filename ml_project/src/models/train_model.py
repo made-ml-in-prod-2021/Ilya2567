@@ -4,10 +4,7 @@ import logging
 
 import hydra
 import pandas as pd
-from sklearn.compose import ColumnTransformer
 from sklearn.metrics import f1_score, confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
 import yaml
 
 from ..entities import TrainingParams, ProcessedData

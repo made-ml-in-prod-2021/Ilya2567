@@ -11,9 +11,10 @@ from sklearn.pipeline import Pipeline
 # import yaml
 
 # from ..entities import TrainingParams
-from ..entities import FeaturesParams
+from ..entities import FeaturesParams, ProcessedData
 from ..models import pickle_dump
 from .binary_encoder import BinaryEncoder
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -44,26 +45,31 @@ def build_features(cfg: FeaturesParams):
     num_pipe = Pipeline([
         ('num_scaler', num_enc)
     ])
-    logger.debug('cwd: %s', hydra.utils.get_original_cwd())
 
     col_transformer = ColumnTransformer([
         ('bin_pipe', bin_pipe, list(cfg.binary_columns)),
         ('cat_pipe', cat_pipe, list(cfg.categorical_columns)),
         ('num_pipe', num_pipe, list(cfg.numerical_columns)),
     ])
-    x_train = col_transformer.fit_transform(heart_train)
-    x_test = col_transformer.transform(heart_test)
+    data = ProcessedData()
+    data.x_train = col_transformer.fit_transform(heart_train)
+    data.x_test = col_transformer.transform(heart_test)
+    data.target_train = target_train
+    data.target_test = target_test
 
     # Выходные пути заданы жестко, поскольку не предполагают изменения и служат
     # передаточным звеном между модулями проекта
     path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'x_train.csv')
-    pd.DataFrame(x_train).to_csv(path, index=False)
+    pd.DataFrame(data.x_train).to_csv(path, index=False)
     path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'x_test.csv')
-    pd.DataFrame(x_test).to_csv(path, index=False)
+    pd.DataFrame(data.x_test).to_csv(path, index=False)
     path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'target_train.csv')
-    target_train.to_csv(path, index=False)
+    data.target_train.to_csv(path, index=False)
     path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'target_test.csv')
-    target_test.to_csv(path, index=False)
+    data.target_test.to_csv(path, index=False)
+
+    metrics = {name: df.shape for name, df in data.__dict__.items()}
+    logger.debug('shapes: %s', metrics)
 
     path = os.path.join(hydra.utils.get_original_cwd(), 'models', cfg.transformer_filename)
     pickle_dump(col_transformer, path)

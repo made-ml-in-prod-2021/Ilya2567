@@ -11,6 +11,7 @@ from .splits import SplitConfig
 
 @dataclass()
 class FeaturesParams:
+    data_filename: str = MISSING
     splits: SplitConfig = MISSING
     categorical_encoders: ObjectConfig = MISSING
     numerical_encoders: ObjectConfig = MISSING

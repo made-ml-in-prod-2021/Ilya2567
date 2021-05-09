@@ -1,72 +1,51 @@
 import os
-# import pickle
 import logging
 
 import hydra
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.metrics import f1_score, confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-import yaml
 
-from ..entities import TrainingParams, ProcessedData
-from .utils import pickle_dump
+from ..entities import PredictParams
+from .utils import pickle_load
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def train(cfg: TrainingParams):
-    logger.info("Started train pipeline")
+def predict(cfg: PredictParams):
+    logger.info("Prediction started")
     logger.debug('cwd: %s', hydra.utils.get_original_cwd())
 
     # Входные пути пути заданы жестко, поскольку не предполагают изменения и служат
     # передаточным звеном между модулями проекта
-    logger.info("Loading processed data")
-    data = ProcessedData()
-    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'x_train.csv')
-    data.x_train = pd.read_csv(path)
-    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'x_test.csv')
-    data.x_test = pd.read_csv(path)
-    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'target_train.csv')
-    data.target_train = pd.read_csv(path).iloc[:, 0]
-    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'target_test.csv')
-    data.target_test = pd.read_csv(path).iloc[:, 0]
+    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'raw', cfg.data_filename)
+    data_raw = pd.read_csv(path)
+    logger.debug('raw_data_shape: %s', data_raw.shape)
+    path = os.path.join(hydra.utils.get_original_cwd(), 'models', cfg.transformer_filename)
+    transformer: ColumnTransformer = pickle_load(path)
+    cols = set.union(*[set(tp[2]) for tp in transformer.transformers_])
+    cols = [col for col in data_raw.columns if col in cols]
+    data = transformer.transform(data_raw[cols])
+    logger.debug('processed_data_shape: %s', data.shape)
 
-    metrics = {name: df.shape for name, df in data.__dict__.items()}
-    logger.debug('shapes: %s', metrics)
+    path = os.path.join(hydra.utils.get_original_cwd(), 'models', cfg.model_filename)
+    model = pickle_load(path)
+    logger.debug('model: %s', model)
 
-    model = hydra.utils.instantiate(cfg.models)
-    model.fit(data.x_train, data.target_train)
-    pickle_dump(model, 'model.pkl')
+    y_pred = model.predict(data)
+    logger.debug('predict_shape: %s', y_pred.shape)
+    pd.Series(y_pred, name='predict').to_csv('predict.csv', index=False)
 
-    y_pred = model.predict(data.x_test)
-    metrics = {
-        'score': float(model.score(data.x_train, data.target_train)),
-        'f1_metric': float(f1_score(y_pred, data.target_test)),
-        'conf_matrix': confusion_matrix(y_pred, data.target_test).tolist(),
-    }
-    logger.debug('score: %.4f', metrics['score'])
-    logger.info('f1_metric: %.4f', metrics['f1_metric'])
-    conf_matrix_str = '\n'.join(map(str, metrics['conf_matrix']))
-    logger.info('confusion_matrix: \n%s', conf_matrix_str)
-
-    # path = os.path.join('reports', 'model.yml')
-    with open('metrics.yaml', "w") as fin:
-        yaml_report = yaml.dump(metrics)
-        fin.writelines(yaml_report)
-
-    logger.info("Finished train pipeline")
+    logger.info("Prediction finished")
 
 
 @hydra.main(
     config_path=os.path.join('..', '..', 'configs'),
-    config_name="training_params.yaml"
+    config_name="predict_params.yaml"
 )
-def train_pipeline_command(cfg: TrainingParams = None):
+def train_pipeline_command(cfg: PredictParams = None):
     logger.debug("cfg: %s", cfg)
-    train(cfg)
+    predict(cfg)
 
 
 # python -m src.models.train_model --config-name training_params.yaml

@@ -22,7 +22,7 @@ def build_features(cfg: FeaturesParams):
     logger.info("Started feature engineering")
     logger.debug('cwd: %s', hydra.utils.get_original_cwd())
 
-    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'raw', 'heart.csv')
+    path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'raw', cfg.data_filename)
     heart = pd.read_csv(path)
     assert heart.isna().sum().sum() == 0
 

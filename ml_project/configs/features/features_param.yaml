@@ -6,3 +6,4 @@ defaults:
 target_column: 'target'
 categorical_columns: ['sex', 'fbs', 'exang', 'cp', 'restecg', 'slope', 'thal']
 numerical_columns: ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']
+transformer_filename: 'transformer.pkl'

@@ -12,7 +12,7 @@ from sklearn.pipeline import Pipeline
 
 # from ..entities import TrainingParams
 from ..entities import FeaturesParams
-# from .utils import pickle_dump
+from ..models import pickle_dump
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -58,8 +58,10 @@ def build_features(cfg: FeaturesParams):
     path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'processed', 'target_test.csv')
     target_test.to_csv(path, index=False)
 
-    logger.info("Finished feature engineering")
+    path = os.path.join(hydra.utils.get_original_cwd(), 'models', cfg.transformer_filename)
+    pickle_dump(col_transformer, path)
 
+    logger.info("Finished feature engineering")
 
 @hydra.main(
     config_path=os.path.join('..', '..', 'configs'),

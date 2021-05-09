@@ -17,6 +17,7 @@ class FeaturesParams:
     target_column: str = MISSING
     categorical_columns: List[str] = MISSING
     numerical_columns: List[str] = MISSING
+    transformer_filename: str = MISSING
 
 
 @dataclass()

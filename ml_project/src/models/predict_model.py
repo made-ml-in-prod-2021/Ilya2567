@@ -39,8 +39,7 @@ def train(cfg: TrainingParams):
 
     model = hydra.utils.instantiate(cfg.models)
     model.fit(data.x_train, data.target_train)
-    path = os.path.join(hydra.utils.get_original_cwd(), 'models', cfg.model_filename)
-    pickle_dump(model, path)
+    pickle_dump(model, 'model.pkl')
 
     y_pred = model.predict(data.x_test)
     metrics = {

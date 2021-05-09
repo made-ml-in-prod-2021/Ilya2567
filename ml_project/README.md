@@ -1,3 +1,4 @@
+![CI workflow](https://github.com/made-ml-in-prod-2021/Ilya2567/actions/workflows/hw1.yaml/badge.svg?branch=homework1)
 # ML in prod: Homework 1
 
 ## Data
@@ -5,10 +6,15 @@
 1. Склонируйте репозиторий:
    ```bash
    git clone https://github.com/made-ml-in-prod-2021/Ilya2567.git
-   cd Ilya2567
+   git checkout homework1
    ```
 
-2. Создайте новое рабочее окружение:
+2. Перейдите в папку `ml_project`:
+   ```bash
+   cd Ilya2567/ml_project
+   ```
+   
+3. Создайте новое рабочее окружение:
     
    - Installation (for Linux):
    ```bash
@@ -21,11 +27,6 @@
    python -m venv .venv
    .venv\Scripts\activate.bat
    pip install -r requirements.txt
-   ```
-   
-3. Перейдите в папку `ml_project`:
-   ```bash
-   cd ml_project
    ```
 
 4. Скачайте [датасет](https://www.kaggle.com/ronitf/heart-disease-uci) и распакуйте его в каталог `data/raw`:
@@ -91,8 +92,8 @@
 
 Настроены проверки на гитхабе при пуллинге проекта.
 
-Качество кода(pylint): ---
+Качество кода проверено flake8.
 
 Покрытие тестами(pytest): отсустствует
 
-Работа выполнена на 32 балла, поскольку отсустствует покрытие тестами.
+Работа выполнена на 31 балл, поскольку отсустствует покрытие тестами.

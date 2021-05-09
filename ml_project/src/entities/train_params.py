@@ -1,11 +1,8 @@
-# from dataclasses import dataclass, field
 from dataclasses import dataclass
-from typing import List
 
 from omegaconf import MISSING
 
 from .models import ObjectConfig
-from .splits import SplitConfig
 
 
 @dataclass()

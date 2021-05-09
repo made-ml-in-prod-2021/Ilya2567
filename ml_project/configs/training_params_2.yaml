@@ -1,4 +1,4 @@
 defaults:
-  - models: rfc_depth5
+  - models: lr_c.2
 
 model_filename: 'model.pkl'

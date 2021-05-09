@@ -1,0 +1,10 @@
+defaults:
+  - splits: test_25_random_24.yaml
+  - categorical_encoders: ohe_drop_binary
+  - numerical_encoders: StandardScaler
+
+data_filename: 'heart.csv'
+target_column: 'target'
+categorical_columns: ['sex', 'fbs', 'exang', 'cp', 'restecg', 'slope', 'thal']
+numerical_columns: ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']
+transformer_filename: 'transformer.pkl'

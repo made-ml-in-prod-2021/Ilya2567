@@ -13,6 +13,7 @@ from sklearn.pipeline import Pipeline
 # from ..entities import TrainingParams
 from ..entities import FeaturesParams
 from ..models import pickle_dump
+from .binary_encoder import BinaryEncoder
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -34,13 +35,19 @@ def build_features(cfg: FeaturesParams):
 
     cat_enc = hydra.utils.instantiate(cfg.categorical_encoders)
     num_enc = hydra.utils.instantiate(cfg.numerical_encoders)
+    bin_pipe = Pipeline([
+        ('bin', BinaryEncoder())
+    ])
     cat_pipe = Pipeline([
         ('cat_scaler', cat_enc)
     ])
     num_pipe = Pipeline([
         ('num_scaler', num_enc)
     ])
+    logger.debug('cwd: %s', hydra.utils.get_original_cwd())
+
     col_transformer = ColumnTransformer([
+        ('bin_pipe', bin_pipe, list(cfg.binary_columns)),
         ('cat_pipe', cat_pipe, list(cfg.categorical_columns)),
         ('num_pipe', num_pipe, list(cfg.numerical_columns)),
     ])
@@ -62,6 +69,7 @@ def build_features(cfg: FeaturesParams):
     pickle_dump(col_transformer, path)
 
     logger.info("Finished feature engineering")
+
 
 @hydra.main(
     config_path=os.path.join('..', '..', 'configs'),

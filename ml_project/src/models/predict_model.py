@@ -21,8 +21,10 @@ def predict(cfg: PredictParams):
     path = os.path.join(hydra.utils.get_original_cwd(), 'data', 'raw', cfg.data_filename)
     data_raw = pd.read_csv(path)
     logger.debug('raw_data_shape: %s', data_raw.shape)
+
     path = os.path.join(hydra.utils.get_original_cwd(), 'models', cfg.transformer_filename)
     transformer: ColumnTransformer = pickle_load(path)
+
     cols = set.union(*[set(tp[2]) for tp in transformer.transformers_])
     cols = [col for col in data_raw.columns if col in cols]
     data = transformer.transform(data_raw[cols])

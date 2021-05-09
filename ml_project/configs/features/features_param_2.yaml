@@ -5,6 +5,7 @@ defaults:
 
 data_filename: 'heart.csv'
 target_column: 'target'
-categorical_columns: ['sex', 'fbs', 'exang', 'cp', 'restecg', 'slope', 'thal']
+binary_columns: ['sex','fbs','exang',]
+categorical_columns: ['cp','restecg','slope','thal']
 numerical_columns: ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']
 transformer_filename: 'transformer.pkl'

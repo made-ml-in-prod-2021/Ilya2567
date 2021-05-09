@@ -16,6 +16,7 @@ class FeaturesParams:
     categorical_encoders: ObjectConfig = MISSING
     numerical_encoders: ObjectConfig = MISSING
     target_column: str = MISSING
+    binary_columns: List[str] = MISSING
     categorical_columns: List[str] = MISSING
     numerical_columns: List[str] = MISSING
     transformer_filename: str = MISSING

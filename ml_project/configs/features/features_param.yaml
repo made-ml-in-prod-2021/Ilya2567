@@ -1,0 +1,8 @@
+defaults:
+  - splits: test_20_random_42
+  - categorical_encoders: ohe_drop_binary
+  - numerical_encoders: StandardScaler
+
+target_column: 'target'
+categorical_columns: ['sex', 'fbs', 'exang', 'cp', 'restecg', 'slope', 'thal']
+numerical_columns: ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']

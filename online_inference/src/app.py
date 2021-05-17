@@ -19,4 +19,4 @@ async def read_item(item_id):
 
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="localhost", port=os.getenv("PORT", 8000))
+    uvicorn.run("src.app:app", host="localhost", port=os.getenv("PORT", 8000))

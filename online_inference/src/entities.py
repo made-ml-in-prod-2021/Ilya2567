@@ -9,7 +9,7 @@ FEATURES = ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach',
 
 
 class DiagnosisResponse(BaseModel):
-    id: str
+    id: int
     diagnosis: int
 
 

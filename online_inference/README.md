@@ -1,4 +1,3 @@
-# Машинное обучение в продакшене
 # Второе ДЗ: online_inference
 
 ## Основные команды
@@ -6,6 +5,8 @@
 Install
 ~~~
 git clone https://github.com/made-ml-in-prod-2021/Ilya2567.git
+cd Ilya2567/
+git checkout homework2
 cd online_inference/
 
 python -m venv .venv
@@ -46,7 +47,7 @@ docker run --network host ilya4678/model_inference:v1
 (3) Напишите скрипт, который будет делать запросы к вашему сервису.
 <br>Баллы: +2 балла
 
-(4.) Сделайте валидацию входных данных.
+(4) Сделайте валидацию входных данных.
 <br>Баллы: +3 балла
 
 (5) Напишите dockerfile, соберите на его основе образ и запустите локально контейнер(docker build, docker run).

@@ -22,7 +22,7 @@ Run docker and make requests
 ~~~
 docker run --network host ilya4678/model_inference:v1
 
-curl -X 'POST' 'http://localhost:8000/predict' -H 'accept: application/json' -d '{"features": ["age", "sex", "cp", "trestbps", "chol", "fbs", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal"], "data":[[1,1,1,1,1,1,1,1,1,1,1,1,1], [0,0,0,0,0,0,0,0,0,0,0,0,0]]}'
+python -m src.query
 ~~~
 
 Push docker
@@ -43,6 +43,9 @@ docker run --network host ilya4678/model_inference:v1
 (1) Оберните inference вашей модели в rest сервис.
 <br>Баллы: +3 балла
 
+(3) Напишите скрипт, который будет делать запросы к вашему сервису.
+<br>Баллы: +2 балла
+
 (4.) Сделайте валидацию входных данных.
 <br>Баллы: +3 балла
 
@@ -53,6 +56,7 @@ docker run --network host ilya4678/model_inference:v1
 - Использовал slim версию питона (1.38G -> 607M)
 - Создал отдельный файл `requirements_docker.txt`, с м**е**ньшим количеством пакетов 
 - Создал файл .dockerignore, чтобы исключить копирование служебных файлов PyCharm
+
 <br>Баллы: +3 балла
 
 (7) опубликуйте образ в https://hub.docker.com/.
@@ -65,3 +69,5 @@ docker run --network host ilya4678/model_inference:v1
 
 (5) проведите самооценку.
 <br>Баллы: +1 балл
+
+Итого: 19 баллов

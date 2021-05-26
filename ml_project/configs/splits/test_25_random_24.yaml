@@ -1,0 +1,3 @@
+# @package _group_
+test_size: 0.25
+random_state: 24

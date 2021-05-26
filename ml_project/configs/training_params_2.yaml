@@ -1,0 +1,4 @@
+defaults:
+  - models: lr_c.2
+
+model_filename: 'model.pkl'

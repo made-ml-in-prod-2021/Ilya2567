@@ -1,0 +1,11 @@
+defaults:
+  - splits: test_20_random_42.yaml
+  - categorical_encoders: ohe_drop_binary
+  - numerical_encoders: QuantileTransformer
+
+data_filename: 'heart.csv'
+target_column: 'target'
+binary_columns: ['sex','fbs','exang',]
+categorical_columns: ['cp','restecg','slope','thal']
+numerical_columns: ['age', 'trestbps', 'chol', 'thalach', 'oldpeak', 'ca']
+transformer_filename: 'transformer.pkl'

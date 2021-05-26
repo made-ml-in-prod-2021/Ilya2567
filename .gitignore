@@ -1,0 +1,5 @@
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+.idea/
+./ml_project/outputs/
+./ml_project/models/

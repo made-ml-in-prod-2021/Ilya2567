@@ -3,3 +3,4 @@
 .idea/
 ./ml_project/outputs/
 ./ml_project/models/
+*.log
